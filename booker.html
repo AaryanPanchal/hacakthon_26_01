@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nauka-Uber - Request Shipping Lane</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0b1d33; margin: 0; padding: 40px; display: flex; justify-content: center; color: #fff; }
+        .form-container { background: #152942; padding: 40px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); width: 100%; max-width: 600px; border: 1px solid #233c5b; }
+        h2 { color: #00d2ff; margin-top: 0; margin-bottom: 25px; text-align: center; font-size: 28px; letter-spacing: 1px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: #cbd5e1; font-size: 14px; }
+        input[type="text"], input[type="number"], input[type="date"], select { width: 100%; padding: 12px; border: 1px solid #2d4a6b; border-radius: 6px; background: #0f2038; color: #fff; font-size: 15px; box-sizing: border-box; }
+        input:focus, select:focus { border-color: #00d2ff; outline: none; box-shadow: 0 0 8px rgba(0, 210, 255, 0.5); }
+        .row { display: flex; gap: 15px; }
+        .row .form-group { flex: 1; }
+        .cargo-item { background: #1c3554; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #00d2ff; }
+        button { width: 100%; background: linear-gradient(135deg, #00d2ff 0%, #0072ff 100%); color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4); margin-top: 15px; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0, 114, 255, 0.6); }
+        .status-msg { margin-top: 20px; padding: 12px; border-radius: 6px; display: none; text-align: center; font-weight: bold; font-size: 14px; }
+        .success { background-color: #064e3b; color: #34d399; border: 1px solid #047857; }
+        .error { background-color: #7f1d1d; color: #f87171; border: 1px solid #b91c1c; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>📦 Request Cargo Freight</h2>
+    <form id="bookingForm">
+        <div class="row">
+            <div class="form-group">
+                <label for="originPort">Source Pickup Port</label>
+                <select id="originPort" required>
+                    <option value="" disabled selected>Select Origin</option>
+                    <option value="Mundra">Mundra Port (Gujarat)</option>
+                    <option value="Kandla">Kandla Port (Gujarat)</option>
+                    <option value="Paradip">Paradip Port (Odisha)</option>
+                    <option value="Haldia">Haldia Port (West Bengal)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="destPort">Destination Port</label>
+                <select id="destPort" required>
+                    <option value="" disabled selected>Select Destination</option>
+                    <option value="Mundra">Mundra Port (Gujarat)</option>
+                    <option value="Kandla">Kandla Port (Gujarat)</option>
+                    <option value="Paradip">Paradip Port (Odisha)</option>
+                    <option value="Haldia">Haldia Port (West Bengal)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <label for="pickupDate">Desired Pickup Date</label>
+                <input type="date" id="pickupDate" required>
+            </div>
+            <div class="form-group">
+                <label for="deliveryDate">Target Reach Date</label>
+                <input type="date" id="deliveryDate" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Multi-Commodity Cargo Manifest (Enter Qty for each type if mixed)</label>
+            
+            <!-- Item 1: Container Cargo Option -->
+            <div class="cargo-item row">
+                <div class="form-group" style="flex: 2;">
+                    <label style="font-size:12px; color:#cbd5e1;">Cargo Type 1</label>
+                    <select class="cargo-type">
+                        <option value="Container" selected>Container Cargo</option>
+                        <option value="Machinery">Small Machinery Fleet</option>
+                        <option value="Bulk">Bulk Cargo (Coal/Ore)</option>
+                        <option value="Vehicles">Vehicles (Ro-Ro)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <label style="font-size:12px; color:#cbd5e1;">Quantity 1</label>
+                    <input type="number" class="cargo-qty" placeholder="Weight (Metric Tons)" required>
+                </div>
+            </div>
+
+            <!-- Item 2: Small Machinery Option (Mixed Loading) -->
+            <div class="cargo-item row">
+                <div class="form-group" style="flex: 2;">
+                    <label style="font-size:12px; color:#cbd5e1;">Cargo Type 2 (Optional mixed load)</label>
+                    <select class="cargo-type">
+                        <option value="">None (No second cargo type)</option>
+                        <option value="Machinery" selected>Small Machinery Fleet</option>
+                        <option value="Container">Container Cargo</option>
+                        <option value="Bulk">Bulk Cargo (Coal/Ore)</option>
+                        <option value="Vehicles">Vehicles (Ro-Ro)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <label style="font-size:12px; color:#cbd5e1;">Quantity 2</label>
+                    <input type="number" class="cargo-qty" placeholder="Weight (Metric Tons)">
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" id="requestBtn">Broadcast Request to Fleet</button>
+        <div id="statusBox" class="status-msg"></div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const requestBtn = document.getElementById('requestBtn');
+        const statusBox = document.getElementById('statusBox');
+        
+        requestBtn.innerText = "Calculating Constraints...";
+        requestBtn.disabled = true;
+
+        const cargoItems = [];
+        const types = document.querySelectorAll('.cargo-type');
+        const qts = document.querySelectorAll('.cargo-qty');
+
+        types.forEach((element, index) => {
+            if(element.value !== "" && qts[index].value !== "") {
+                cargoItems.push({
+                    type: element.value,
+                    qty: parseInt(qts[index].value) || 0
+                });
+            }
+        });
+
+        const bookingPayload = {
+            originPort: document.getElementById('originPort').value,
+            destPort: document.getElementById('destPort').value,
+            pickupDate: document.getElementById('pickupDate').value,
+            deliveryDate: document.getElementById('deliveryDate').value,
+            manifest: cargoItems
+        };
+
+        // 🔗 તારો n8n વાળો સેકન્ડ બુકિંગ વેબહુક લિંક અહીં પેસ્ટ કરવાનો રહેશે!
+        const n8nBookingWebhookUrl = "https://n8n.cloud";
+
+        fetch(n8nBookingWebhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bookingPayload)
+        })
+        .then(res => { if (res.ok) return res.json(); throw new Error(); })
+        .then(data => {
+            statusBox.className = "status-msg success";
+            statusBox.innerText = "🚀 Freight Request Broadcasted! n8n is scanning active fleets.";
+            statusBox.style.display = "block";
+        })
+        .catch(() => {
+            statusBox.className = "status-msg error";
+            statusBox.innerText = "⚠️ Broadcast Fault. Verify n8n Webhook Node status.";
+            statusBox.style.display = "block";
+        })
+        .finally(() => {
+            requestBtn.innerText = "Broadcast Request to Fleet";
+            requestBtn.disabled = false;
+        });
+    });
+</script>
+</body>
+</html>

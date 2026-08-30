@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nauka-Uber - Owner Schedule Console</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0b1d33; margin: 0; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; color: #fff; }
+        .panel { background: #152942; padding: 45px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); width: 100%; max-width: 580px; border: 1px solid #233c5b; box-sizing: border-box; }
+        h2 { color: #00d2ff; margin-top: 0; margin-bottom: 25px; font-size: 26px; border-bottom: 2px solid #2d4a6b; padding-bottom: 12px; text-align: center; letter-spacing: 0.5px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: #cbd5e1; font-size: 14px; }
+        input[type="text"], input[type="number"], input[type="date"], select { width: 100%; padding: 12px; border: 1px solid #2d4a6b; border-radius: 6px; background: #0f2038; color: #fff; font-size: 15px; box-sizing: border-box; }
+        input:focus, select:focus { border-color: #00d2ff; outline: none; box-shadow: 0 0 8px rgba(0, 210, 255, 0.5); }
+        button { width: 100%; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.4); margin-top: 10px; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(217, 119, 6, 0.6); }
+        button:disabled { background: #475569; cursor: not-allowed; transform: none; box-shadow: none; }
+        .row { display: flex; gap: 15px; }
+        .row .form-group { flex: 1; }
+        .status-msg { margin-top: 20px; padding: 12px; border-radius: 6px; display: none; text-align: center; font-weight: bold; font-size: 14px; }
+        .success { background-color: #064e3b; color: #34d399; border: 1px solid #047857; }
+        .error { background-color: #7f1d1d; color: #f87171; border: 1px solid #b91c1c; }
+        .back-link { display: inline-block; color: #cbd5e1; margin-bottom: 20px; text-decoration: none; font-size: 14px; }
+        .back-link:hover { color: #00d2ff; }
+    </style>
+</head>
+<body>
+
+<div class="panel">
+    <a href="index.html" class="back-link">◀ Back to Welcome Gateway</a>
+    <h2>📅 Regular Status Updates (Daily Ops Log)</h2>
+    <form id="statusForm">
+        
+        <!-- Vessel Verification Slot -->
+        <div class="form-group">
+            <label for="statusImo">Verify Ship IMO Number (7 Digits Required)</label>
+            <input type="text" id="statusImo" pattern="[0-9]{7}" required placeholder="e.g., 9619907">
+        </div>
+        
+        <!-- 90-Days Calendar Constraint Slot -->
+        <div class="form-group">
+            <label>Mark Not Available/Busy Calendar Duration (Advanced 3-Month Booking Limit Constraints)</label>
+            <div class="row">
+                <div class="form-group">
+                    <label style="font-size:11px; color:#cbd5e1; margin-bottom: 4px;">Unavailable From</label>
+                    <input type="date" id="busyFrom" required>
+                </div>
+                <div class="form-group">
+                    <label style="font-size:11px; color:#cbd5e1; margin-bottom: 4px;">Unavailable Until</label>
+                    <input type="date" id="busyTo" required>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Next Free Location Slot -->
+        <div class="form-group">
+            <label for="nextFreePort">Next Available Free Destination Port Location</label>
+            <select id="nextFreePort" required>
+                <option value="" disabled selected>Select Next Port Location</option>
+                <option value="Mundra">Mundra Port (Gujarat)</option>
+                <option value="Kandla">Kandla Port (Gujarat)</option>
+                <option value="Paradip">Paradip Port (Odisha)</option>
+                <option value="Haldia">Haldia Port (West Bengal)</option>
+            </select>
+        </div>
+        
+        <button type="submit" id="statusBtn">Update Daily Lane Status</button>
+        <div id="opsStatus" class="status-msg"></div>
+    </form>
+</div>
+
+<script>
+    // 📅 ૩ મહિનાની એડવાન્સ બુકિંગ કૅલેન્ડર કન્સ્ટ્રેઇન્ટ (90 Days Threshold Boundary)
+    window.addEventListener('DOMContentLoaded', () => {
+        const busyFromInput = document.getElementById('busyFrom');
+        const busyToInput = document.getElementById('busyTo');
+        
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        
+        const maxDate = new Date();
+        maxDate.setMonth(today.getMonth() + 3);
+        const maxDateStr = maxDate.toISOString().split('T')[0];
+        
+        busyFromInput.min = todayStr;
+        busyFromInput.max = maxDateStr;
+        busyToInput.min = todayStr;
+        busyToInput.max = maxDateStr;
+        
+        console.log(`Global calendar limitations engaged. Boundary maximum date: ${maxDateStr}`);
+    });
+
+    // 🔗 તમારી સાચી અને અસલી n8n દૈનિક સ્ટેટસ લિંક અહીં સેટ થઈ ગઈ છે!
+    const n8nDailyStatusUrl = "https://n8n.cloud";
+
+    document.getElementById('statusForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('statusBtn');
+        const box = document.getElementById('opsStatus');
+        btn.innerText = "Broadcasting Route Schedule...";
+        btn.disabled = true;
+
+        const payload = {
+            imo: document.getElementById('statusImo').value,
+            busyWindow: { 
+                from: document.getElementById('busyFrom').value, 
+                to: document.getElementById('busyTo').value 
+            },
+            nextFreePort: document.getElementById('nextFreePort').value
+        };
+
+        console.log("Transmitting operational payload to eshan8nn instance:", payload);
+
+        fetch(n8nDailyStatusUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => { if(res.ok) return res.json(); throw new Error(); })
+        .then(() => {
+            box.className = "status-msg success";
+            box.innerText = "📅 Daily Availability Schedule Update Logged into n8n Cloud!";
+            box.style.display = "block";
+            document.getElementById('statusForm').reset();
+        })
+        .catch(() => {
+            box.className = "status-msg error";
+            box.innerText = "⚠️ Network Transmission Error. Ensure your n8n 'daily-status' Webhook is active.";
+            box.style.display = "block";
+        })
+        .finally(() => { 
+            btn.innerText = "Update Daily Lane Status";
+            btn.disabled = false; 
+        });
+    });
+</script>
+</body>
+</html>

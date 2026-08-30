@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nauka-Uber - Fleet Registration</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0b1d33; margin: 0; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 90vh; color: #fff; }
+        .panel { background: #152942; padding: 40px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); width: 100%; max-width: 650px; border: 1px solid #233c5b; box-sizing: border-box; }
+        h1 { color: #00d2ff; margin-top: 0; margin-bottom: 10px; font-size: 32px; letter-spacing: 1px; text-align: center; }
+        p { color: #cbd5e1; margin-bottom: 35px; font-size: 16px; text-align: center; }
+        .btn-gate { display: block; width: 100%; padding: 16px; margin-bottom: 20px; font-size: 18px; font-weight: bold; color: white; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; box-sizing: border-box; transition: all 0.3s ease; text-align: center; }
+        .btn-owner { background: linear-gradient(135deg, #00d2ff 0%, #0072ff 100%); box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4); }
+        .btn-owner:hover { transform: translateY(-3px); }
+        .btn-booker { background: linear-gradient(135deg, #34d399 0%, #059669 100%); box-shadow: 0 4px 15px rgba(5, 150, 105, 0.4); margin-bottom: 0; }
+        .btn-booker:hover { transform: translateY(-3px); }
+        
+        #regSection { display: none; text-align: left; margin-top: 20px; }
+        h2 { color: #00d2ff; margin-top: 0; margin-bottom: 20px; font-size: 24px; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 8px; color: #cbd5e1; font-size: 14px; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 12px; border: 1px solid #2d4a6b; border-radius: 6px; background: #0f2038; color: #fff; font-size: 15px; box-sizing: border-box; }
+        input:focus { border-color: #00d2ff; outline: none; box-shadow: 0 0 8px rgba(0, 210, 255, 0.5); }
+        .row { display: flex; gap: 15px; }
+        .row .form-group { flex: 1; }
+        
+        /* Dynamic Capability Selection Row Style */
+        .capability-row { display: flex; align-items: center; justify-content: space-between; background: #1c3554; padding: 12px; border-radius: 6px; margin-bottom: 10px; border: 1px solid #2d4a6b; gap: 15px; }
+        .chk-box { display: flex; align-items: center; gap: 10px; flex: 1; }
+        input[type="checkbox"] { transform: scale(1.2); cursor: pointer; min-width: 18px; }
+        .checkbox-label { color: #e2e8f0; font-size: 13.5px; cursor: pointer; margin-bottom: 0; line-height: 1.4; }
+        .qty-input-box { width: 140px; display: none; padding: 8px !important; font-size: 14px !important; background: #0f2038; border: 1px solid #2d4a6b; color: #fff; border-radius: 4px; }
+
+        .btn-submit { width: 100%; background: linear-gradient(135deg, #00d2ff 0%, #0072ff 100%); color: white; border: none; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4); }
+        .status-msg { margin-top: 15px; padding: 10px; border-radius: 4px; display: none; text-align: center; font-weight: bold; font-size: 14px; }
+        .success { background-color: #064e3b; color: #34d399; border: 1px solid #047857; }
+        .error { background-color: #7f1d1d; color: #f87171; border: 1px solid #b91c1c; }
+        .back-btn { display: inline-block; color: #cbd5e1; margin-bottom: 15px; text-decoration: none; font-size: 14px; cursor: pointer; }
+        .back-btn:hover { color: #00d2ff; }
+    </style>
+</head>
+<body>
+
+<!-- Gateway Profile Section -->
+<div class="panel" id="gatewaySection">
+    <h1>🚢 Nauka-Uber</h1>
+    <p>Select your portal profile entrance</p>
+    <button class="btn-gate btn-owner" onclick="showRegistrationForm()">1. Ship Owner Portal</button>
+    <a href="booker.html" class="btn-gate btn-booker">2. Cargo Booker Portal</a>
+</div>
+
+<!-- Registration Form Section -->
+<div class="panel" id="regSection">
+    <span class="back-btn" onclick="showGateway()">◀ Back to Roles</span>
+    <h2>🚢 Enterprise Vessel Fleet Registration</h2>
+    <form id="vesselForm">
+        <div class="form-group">
+            <label for="vesselName">Vessel Merchant Fleet Name</label>
+            <input type="text" id="vesselName" required placeholder="e.g., MV Sea Voyager">
+        </div>
+        <div class="row">
+            <div class="form-group">
+                <label for="imoNumber">IMO Number (International Maritime Organization - 7 Digits)</label>
+                <input type="text" id="imoNumber" pattern="[0-9]{7}" required placeholder="e.g., 9619907">
+            </div>
+            <div class="form-group">
+                <label for="maxCapacity">Max DWT Capacity (Deadweight Tonnage Limit - Metric Tons)</label>
+                <input type="number" id="maxCapacity" required placeholder="e.g., 50000">
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="form-group">
+                <label for="lightDraft">Light Draft (Unloaded Vessel Hull Displacement - Meters)</label>
+                <input type="number" step="0.1" id="lightDraft" required placeholder="e.g., 3.5">
+            </div>
+            <div class="form-group">
+                <label for="loadedDraft">Fully Loaded Draft (Maximum Deep Hull Sea Line Level - Meters)</label>
+                <input type="number" step="0.1" id="loadedDraft" required placeholder="e.g., 12.5">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Select Structural Cargo Capacity Constraints & Maximum Quantities</label>
+            
+            <div class="capability-row">
+                <div class="chk-box">
+                    <input type="checkbox" id="capBulk" onchange="toggleQty('capBulk', 'qtyBulk')">
+                    <label for="capBulk" class="checkbox-label">Dry Bulk Carrier (Coal, Iron Ore, Bauxite, Mineral Grain)</label>
+                </div>
+                <input type="number" id="qtyBulk" class="qty-input-box" placeholder="Max Tons">
+            </div>
+
+            <div class="capability-row">
+                <div class="chk-box">
+                    <input type="checkbox" id="capContainer" onchange="toggleQty('capContainer', 'qtyContainer')">
+                    <label for="capContainer" class="checkbox-label">Container Cargo Fleet (Standard Intermodal FEU/TEU Box Freight)</label>
+                </div>
+                <input type="number" id="qtyContainer" class="qty-input-box" placeholder="Max Tons">
+            </div>
+
+            <div class="capability-row">
+                <div class="chk-box">
+                    <input type="checkbox" id="capMachinery" onchange="toggleQty('capMachinery', 'qtyMachinery')">
+                    <label for="capMachinery" class="checkbox-label">General Breakbulk Cargo (Industrial Spare Parts, Small Machinery)</label>
+                </div>
+                <input type="number" id="qtyMachinery" class="qty-input-box" placeholder="Max Tons">
+            </div>
+
+            <div class="capability-row">
+                <div class="chk-box">
+                    <input type="checkbox" id="capVehicles" onchange="toggleQty('capVehicles', 'qtyVehicles')">
+                    <label for="capVehicles" class="checkbox-label">Ro-Ro Carrier (Roll-on/Roll-off Fleet - Automobiles & Heavy Vehicles)</label>
+                </div>
+                <input type="number" id="qtyVehicles" class="qty-input-box" placeholder="Max Tons">
+            </div>
+
+            <div class="capability-row">
+                <div class="chk-box">
+                    <input type="checkbox" id="capLiquid" onchange="toggleQty('capLiquid', 'qtyLiquid')">
+                    <label for="capLiquid" class="checkbox-label">Liquid Bulk Carrier (Unrefined Crude Oil, Non-Hazardous Petroleum Product)</label>
+                </div>
+                <input type="number" id="qtyLiquid" class="qty-input-box" placeholder="Max Tons">
+            </div>
+
+            <div class="capability-row">
+                <div class="chk-box">
+                    <input type="checkbox" id="capChemical" onchange="toggleQty('capChemical', 'qtyChemical')">
+                    <label for="capChemical" class="checkbox-label">Chemical Tanker Fleet (Industrial Acids, Petrochemicals, Corrosive Liquids)</label>
+                </div>
+                <input type="number" id="qtyChemical" class="qty-input-box" placeholder="Max Tons">
+            </div>
+
+            <div class="capability-row">
+                <div class="chk-box">
+                    <input type="checkbox" id="capGas" onchange="toggleQty('capGas', 'qtyGas')">
+                    <label for="capGas" class="checkbox-label">LNG / LPG Gas Carriers (Liquefied Natural Gas / Liquefied Petroleum Gas)</label>
+                </div>
+                <input type="number" id="qtyGas" class="qty-input-box" placeholder="Max Tons">
+            </div>
+
+            <div class="capability-row">
+                <div class="chk-box">
+                    <input type="checkbox" id="capReefer" onchange="toggleQty('capReefer', 'qtyReefer')">
+                    <label for="capReefer" class="checkbox-label">Refrigerated Reefer Vessels (Temperature Controlled Fleet / Perishable Cargo)</label>
+                </div>
+                <input type="number" id="qtyReefer" class="qty-input-box" placeholder="Max Tons">
+            </div>
+
+            <div class="capability-row">
+                <div class="chk-box">
+                    <input type="checkbox" id="capHeavy" onchange="toggleQty('capHeavy', 'qtyHeavy')">
+                    <label for="capHeavy" class="checkbox-label">Heavy Lift Project Cargo (Oversized Power Plants, Windmill Turbines)</label>
